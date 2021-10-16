@@ -7,6 +7,7 @@ var simplemaps_worldmap_mapdata = {
     border_color: "#f0f2f3",
     // popups: "detect",
     popups: "on_click",
+    popup_nocss: "yes",
 
     //State defaults
     state_description: "State description",

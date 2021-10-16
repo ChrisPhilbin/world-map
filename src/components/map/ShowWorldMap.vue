@@ -4,27 +4,61 @@
       ><p class="inline font-bold font-sans text-blue-900 text-2xl">
         Choose a location
       </p>
+      <!-- <button
+        @click="showMenu = !showMenu"
+        class="
+          inline-block
+          h-14
+          bg-white
+          ml-4
+          py-2
+          px-6
+          text-gray-400
+          font-sans
+        "
+      >
+        <span>Nothing selected</span>
+        <ul class="block" :class="[showMenu ? null : hidden]">
+          <li
+            class="
+              z-50
+              block
+              pt-2
+              text-left text-blue-800
+              hover:text-blue-400
+              font-sans
+              bg-white
+            "
+            v-for="region in activeRegions"
+            :key="region.name"
+          >
+            <input type="radio" class="mr-3" />
+            {{ region }}
+          </li>
+        </ul>
+      </button> -->
+
       <select
         v-model="selectedRegion"
+        @change="updateRegion($event)"
         name="region"
         id="region"
         class="inline-block bg-white text-gray-400 max-w-xs ml-6 px-8 py-4"
       >
-        <!-- NEED TO GET OPTION VALUES FROM API AND ITERATE USING V-FOR-->
-        <!-- CONSIDER USING UL and LI ELEMENTS FOR DROPDOWN: http://jsfiddle.net/QSkUR/1/ -->
         <option disabled value="">Nothing selected</option>
         <option
           v-for="region in activeRegions"
           :value="region"
           :key="region"
-          class="font-bold my-5"
+          class="font-bold text-blue-800 my-5 py-5"
         >
+          <input type="radio" />
           {{ region }}
         </option>
       </select>
     </span>
   </div>
-  <div class="grid grid-cols-1 ml-auto mr-auto" id="map"></div>
+  <div class="z-10 grid grid-cols-1 ml-auto mr-auto" id="map"></div>
 </template>
 
 <script>
@@ -32,21 +66,18 @@ export default {
   name: "ShowWorldMap",
   data() {
     return {
+      showMenu: false,
       selectedRegion: "",
       //MOCK DATA FOR TESTING... NEED TO PULL FROM API VIA CREATED() IN FUTURE
-      //BREAK OUT REGIONAL OPTIONS AND MERGE THEM INTO EACH REGION AFTER FETCHED FROM API
-      //   regionOptions: {
-      //     color: "#00A2FF",
-      //     hover_color: "#EDC80A",
-      //     zoomable: "no",
-      //     region_hover_opacity: 0,
-      //   },
       regionOptions: {
+        selected: false,
         color: "#00A2FF",
         hover_color: "#EDC80A",
         zoomable: "no",
         region_hover_opacity: 0,
-        description: `<p class="font-bold pt-5 text-2xl font-sans text-blue-900">REGION_NAME</p><br /><a href="LINK" class="font-bold text-lg font-sans text-blue-900">Read more</a>`,
+        description: `<p class="font-bold pt-1 mx-8 text-2xl font-sans text-blue-900">REGION_NAME</p><br /><span class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-900 inline pb-1" viewBox="0 0 20 20" fill="currentColor">
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+</svg><a href="LINK" class="font-bold text-lg text-left font-sans text-blue-900">Read more</a></span>`,
       },
       regions: {
         0: {
@@ -69,6 +100,11 @@ export default {
           states: ["AU"],
           readMoreUrl: "http://www.zombo.com",
         },
+        4: {
+          name: "Western Europe",
+          states: ["PT", "GB", "IE", "DE", "ES", "FR"],
+          readMoreUrl: "http://www.slashdot.org",
+        },
       },
     };
   },
@@ -76,9 +112,14 @@ export default {
     changeSelectedRegion(event) {
       console.log(event.currentTarget.id, "value of currentTarget.id");
     },
+    updateRegion(event) {
+      let objIndex = Object.values(this.regions).findIndex(
+        (obj) => obj.name === event.currentTarget.value
+      );
+      this.regions[objIndex].selected = true;
+    },
   },
   created() {
-    //initialize regions to blank object to then pull in region data from API from client
     this.simplemaps_worldmap.mapdata.regions = this.mergedRegions;
     // let mapdata = document.createElement("script");
     // mapdata.setAttribute("src", "./mapdata.js");
@@ -120,9 +161,67 @@ export default {
     },
   },
   updated() {
-    //fires whenever there is a state change
-    //ensuring value of selectedRegion has indeed changed
-    console.log(this.selectedRegion, "selected region updated");
+    console.log(this.mergedRegions);
   },
 };
 </script>
+
+<style>
+.tt_sm {
+  border-radius: 5px;
+  box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1000000;
+  background-color: white;
+  /* padding: 7px; */
+  padding-right: 10px;
+  margin-right: 10px;
+  opacity: 0.9;
+  font: 12px/1.5 Verdana, Arial, Helvetica, sans-serif;
+  color: black;
+}
+.tt_name_sm {
+  float: left;
+  font-weight: bold;
+  display: none;
+}
+.xmark_sm {
+  float: right;
+  margin-left: 5px;
+  cursor: pointer;
+  line-height: 0px;
+}
+.tt_custom_sm {
+}
+.tt_mobile_sm {
+  margin-top: 5px;
+  text-align: left;
+}
+.btn_simplemaps {
+  color: black;
+  text-decoration: none;
+  background: #ffffff;
+  display: inline-block;
+  padding: 5px 5px;
+  margin: 0;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  line-height: 1.43;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px solid;
+  border-radius: 4px;
+}
+.btn_simplemaps:hover {
+  text-decoration: underline;
+}
+</style>

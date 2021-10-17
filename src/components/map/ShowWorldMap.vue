@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-1 py-8 z-100">
     <span class="inline"
-      ><p class="inline font-bold font-sans text-blue-900 text-2xl">
+      ><p class="hidden lg:inline font-bold font-sans text-blue-900 text-2xl">
         Choose a location
       </p>
       <div class="inline w-28">
@@ -20,10 +20,17 @@
             w-56
           "
         >
-          <span>Nothing selected</span>
+          <span>
+            {{ selectedRegion ? selectedRegion : "Nothing selected" }}
+          </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-6 w-6 absolute right-4 top-4"
+            :class="[
+              showMenu
+                ? 'transform rotate-180 transition duration-300 text-yellow-500'
+                : 'transition duration-300 text-blue-800',
+            ]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -59,6 +66,7 @@
                   class="mr-3"
                   name="selectedRegion"
                   :value="region"
+                  v-on:change="updateRegion($event)"
                 />
                 <span class="inline font-bold font-sans">{{ region }}</span>
               </label>
@@ -140,10 +148,23 @@ export default {
     };
   },
   methods: {
+    checkMobile() {
+      if (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        )
+      ) {
+        this.mobileDevice = true;
+      } else {
+        this.mobileDevice = false;
+      }
+    },
     changeSelectedRegion(event) {
       console.log(event.currentTarget.id, "value of currentTarget.id");
     },
     updateRegion(event) {
+      this.selectedRegion = event.target.value;
+      this.showMenu = false;
       let objIndex = Object.values(this.regions).findIndex(
         (obj) => obj.name === event.currentTarget.value
       );
@@ -152,7 +173,8 @@ export default {
   },
   created() {
     this.simplemaps_worldmap.mapdata.regions = this.mergedRegions;
-    this.mobileDevice = this.simplemaps_worldmap.mobile_device;
+    this.checkMobile();
+    console.log(this.mobileDevice, "mobile device value based off of method");
     // let mapdata = document.createElement("script");
     // mapdata.setAttribute("src", "./mapdata.js");
     // document.head.appendChild(mapdata);
@@ -189,6 +211,10 @@ export default {
           "REGION_NAME",
           mergedRegions[i].name
         );
+        if (this.mobileDevice) {
+          console.log(this.mobileDevice, "mobile detected!");
+          mergedRegions[i].zoomable = "yes";
+        }
       }
       return mergedRegions;
     },

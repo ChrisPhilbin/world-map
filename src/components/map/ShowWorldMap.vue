@@ -1,44 +1,73 @@
 <template>
-  <div class="grid grid-cols-1 py-8">
+  <div class="grid grid-cols-1 py-8 z-100">
     <span class="inline"
       ><p class="inline font-bold font-sans text-blue-900 text-2xl">
         Choose a location
       </p>
-      <!-- <button
-        @click="showMenu = !showMenu"
-        class="
-          inline-block
-          h-14
-          bg-white
-          ml-4
-          py-2
-          px-6
-          text-gray-400
-          font-sans
-        "
-      >
-        <span>Nothing selected</span>
-        <ul class="block" :class="[showMenu ? null : hidden]">
-          <li
-            class="
-              z-50
-              block
-              pt-2
-              text-left text-blue-800
-              hover:text-blue-400
-              font-sans
-              bg-white
-            "
-            v-for="region in activeRegions"
-            :key="region.name"
+      <div class="inline w-28">
+        <button
+          @click="showMenu = !showMenu"
+          class="
+            inline-block
+            h-14
+            bg-white
+            ml-4
+            py-2
+            px-5
+            text-gray-400
+            font-sans
+            relative
+            w-56
+          "
+        >
+          <span>Nothing selected</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 absolute right-4 top-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <input type="radio" class="mr-3" />
-            {{ region }}
-          </li>
-        </ul>
-      </button> -->
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+          <ul
+            class="block w-56 shadow-lg absolute z-50 top-18 left-0"
+            :class="[showMenu ? null : 'hidden']"
+          >
+            <li
+              class="
+                block
+                py-1
+                px-1
+                text-left text-blue-800
+                hover:text-blue-400
+                font-sans
+                bg-white
+                w-full
+              "
+              v-for="region in activeRegions"
+              :key="region.name"
+            >
+              <label>
+                <input
+                  type="radio"
+                  class="mr-3"
+                  name="selectedRegion"
+                  :value="region"
+                />
+                <span class="inline font-bold font-sans">{{ region }}</span>
+              </label>
+            </li>
+          </ul>
+        </button>
+      </div>
 
-      <select
+      <!-- <select
         v-model="selectedRegion"
         @change="updateRegion($event)"
         name="region"
@@ -55,7 +84,7 @@
           <input type="radio" />
           {{ region }}
         </option>
-      </select>
+      </select> -->
     </span>
   </div>
   <div class="z-10 grid grid-cols-1 ml-auto mr-auto" id="map"></div>
@@ -67,6 +96,7 @@ export default {
   data() {
     return {
       showMenu: false,
+      mobileDevice: false,
       selectedRegion: "",
       //MOCK DATA FOR TESTING... NEED TO PULL FROM API VIA CREATED() IN FUTURE
       regionOptions: {
@@ -75,6 +105,7 @@ export default {
         hover_color: "#EDC80A",
         zoomable: "no",
         region_hover_opacity: 0,
+        region_opacity: 0,
         description: `<p class="font-bold pt-1 mx-8 text-2xl font-sans text-blue-900">REGION_NAME</p><br /><span class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-900 inline pb-1" viewBox="0 0 20 20" fill="currentColor">
   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
 </svg><a href="LINK" class="font-bold text-lg text-left font-sans text-blue-900">Read more</a></span>`,
@@ -121,6 +152,7 @@ export default {
   },
   created() {
     this.simplemaps_worldmap.mapdata.regions = this.mergedRegions;
+    this.mobileDevice = this.simplemaps_worldmap.mobile_device;
     // let mapdata = document.createElement("script");
     // mapdata.setAttribute("src", "./mapdata.js");
     // document.head.appendChild(mapdata);
@@ -148,6 +180,7 @@ export default {
       for (let i = 0; i < mergedArray.length; i++) {
         //Iterate through merged array and replace values in description with value of readMoreUrl and region name from API call
         mergedRegions[i] = mergedArray[i];
+
         mergedRegions[i].description = mergedRegions[i].description.replace(
           "LINK",
           mergedRegions[i].readMoreUrl
@@ -161,7 +194,7 @@ export default {
     },
   },
   updated() {
-    console.log(this.mergedRegions);
+    // console.log(this.mergedRegions);
   },
 };
 </script>

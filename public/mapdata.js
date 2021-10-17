@@ -1,7 +1,7 @@
 var simplemaps_worldmap_mapdata = {
   main_settings: {
     //General settings
-    width: "1000", //'700' or 'responsive'
+    width: "responsive", //'700' or 'responsive'
     background_color: "#f0f2f3",
     background_transparent: "no",
     border_color: "#f0f2f3",
@@ -46,8 +46,8 @@ var simplemaps_worldmap_mapdata = {
     initial_back: "no",
     initial_zoom: -1,
     initial_zoom_solo: "no",
-    region_opacity: 1,
-    region_hover_opacity: 0.6,
+    region_opacity: 0.0,
+    region_hover_opacity: 0.0,
     zoom_out_incrementally: "yes",
     zoom_percentage: 0.99,
     zoom_time: 0.5,

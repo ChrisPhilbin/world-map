@@ -175,7 +175,7 @@ export default {
       mobileDevice: false,
       selectedRegion: "",
       regionOptions: {
-        selected: false,
+        // selected: false,
         color: "#00A2FF",
         hover_color: "#EDC80A",
         zoomable: "no",
@@ -217,7 +217,7 @@ export default {
   methods: {
     checkMobile() {
       if (
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           navigator.userAgent
         )
       ) {
@@ -230,12 +230,15 @@ export default {
       console.log(event.currentTarget.id, "value of currentTarget.id");
     },
     updateRegion(region) {
-      this.simplemaps_worldmap.mapdata.main_settings.initial_zoom = region.id;
+      console.log(region);
+      this.simplemaps_worldmap.region_zoom = region.regionId;
       this.simplemaps_worldmap.mapdata.regions[region.regionId].color =
         "#EDC80A";
       this.simplemaps_worldmap.refresh();
-      this.simplemaps_worldmap.mapdata.regions[region.regionId].color =
-        "#00A2FF";
+      this.simplemaps_worldmap.mapdata.regions[region.regionId].color = this
+        .mobileDevice
+        ? "#FFFFFF"
+        : "#00A2FF";
       this.selectedRegion = region.name;
       this.showMenu = false;
     },
@@ -263,7 +266,11 @@ export default {
     },
     activeRegions: function () {
       return Object.values(this.regions).map((region, index) => {
-        return { name: region.name, regionId: index };
+        return {
+          name: region.name,
+          regionId: index,
+          readMoreUrl: region.readMoreUrl,
+        };
       });
     },
     mergedRegions: function () {

@@ -1,7 +1,7 @@
 var simplemaps_worldmap_mapdata = {
   main_settings: {
     //General settings
-    width: "responsive", //'700' or 'responsive'
+    width: "1000", //'700' or 'responsive'
     background_color: "#f0f2f3",
     background_transparent: "no",
     border_color: "#f0f2f3",
@@ -44,12 +44,12 @@ var simplemaps_worldmap_mapdata = {
     zoom: "no",
     back_image: "no",
     initial_back: "no",
-    initial_zoom: -1,
+    initial_zoom: -1, //CHANGE ON MOBILE?
     initial_zoom_solo: "no",
     region_opacity: 0.0,
     region_hover_opacity: 0.0,
     zoom_out_incrementally: "yes",
-    zoom_percentage: 0.99,
+    zoom_percentage: 0.2, //CHANGE ON MOBILE
     zoom_time: 0.5,
 
     //Popup settings
@@ -59,6 +59,7 @@ var simplemaps_worldmap_mapdata = {
     popup_corners: 5,
     popup_font: "12px/1.5 Verdana, Arial, Helvetica, sans-serif",
     popup_nocss: "no",
+    popup_centered: "auto",
 
     //Advanced settings
     div: "map",

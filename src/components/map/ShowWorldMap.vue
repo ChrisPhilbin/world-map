@@ -337,7 +337,7 @@ export default {
     },
     mergedRegions: function () {
       let isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           navigator.userAgent
         );
       //computed property that returns an object with the regions retreived from the API merged with the regional options

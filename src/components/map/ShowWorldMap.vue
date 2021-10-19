@@ -1,6 +1,4 @@
 <template>
-  <div id="simplemaps_list"></div>
-
   <div class="grid grid-cols-1 py-8 z-100">
     <span v-if="!mobileDevice" class="inline"
       ><p class="inline font-bold font-sans text-blue-900 text-2xl">
@@ -80,10 +78,60 @@
       </div>
     </span>
   </div>
-  <div class="grid grid-cols-1 ml-auto mr-auto relative" id="map">
+  <div
+    v-on:click="resetMap()"
+    class="grid grid-cols-1 ml-auto mr-auto relative"
+    id="map"
+  >
+    <div
+      v-if="mobileDevice && Object.keys(mobileModalInfo).length"
+      class="
+        absolute
+        bottom-4
+        text-black
+        left-14
+        bg-white
+        w-9/12
+        z-10
+        opacity-80
+        rounded-md
+      "
+    >
+      <p class="font-bold pt-1 mx-8 text-2xl font-sans text-blue-900">
+        {{ mobileModalInfo.name }}
+      </p>
+      <br /><span class="align-middle"
+        ><svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-blue-900 inline pb-1"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+            clip-rule="evenodd"
+          /></svg
+        ><a
+          :href="mobileModalInfo.readMoreUrl"
+          class="font-bold text-lg text-left font-sans text-blue-900"
+          >Read more</a
+        ></span
+      >
+    </div>
     <div
       v-if="mobileDevice"
-      class="grid grid-cols-1 py-8 z-10 mx-3 inline absolute top-10 bg-white"
+      class="
+        grid grid-cols-1
+        py-1
+        z-10
+        mx-3
+        inline
+        absolute
+        top-3
+        bg-white
+        opacity-95
+      "
     >
       <span class="inline"
         ><p class="inline font-bold font-sans text-blue-900 text-2xl">
@@ -94,10 +142,10 @@
             @click="showMenu = !showMenu"
             class="
               inline-block
-              h-14
+              h-12
               bg-white
               ml-4
-              py-2
+              py-1
               px-5
               text-gray-400
               font-sans
@@ -173,14 +221,12 @@ export default {
     return {
       showMenu: false,
       mobileDevice: false,
-      selectedRegion: "",
+      selectedRegion: "Europe",
+      mobileModalInfo: {},
       regionOptions: {
-        // selected: false,
         color: "#00A2FF",
         hover_color: "#EDC80A",
         zoomable: "no",
-        region_hover_opacity: 0,
-        region_opacity: 0,
         description: `<p class="font-bold pt-1 mx-8 text-2xl font-sans text-blue-900">REGION_NAME</p><br /><span class="align-middle"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-900 inline pb-1" viewBox="0 0 20 20" fill="currentColor">
   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
 </svg><a href="LINK" class="font-bold text-lg text-left font-sans text-blue-900">Read more</a></span>`,
@@ -216,6 +262,7 @@ export default {
   },
   methods: {
     checkMobile() {
+      //method returns either true or false based on the device type detected
       if (
         /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           navigator.userAgent
@@ -226,32 +273,44 @@ export default {
         this.mobileDevice = false;
       }
     },
-    changeSelectedRegion(event) {
-      console.log(event.currentTarget.id, "value of currentTarget.id");
-    },
     updateRegion(region) {
-      console.log(region);
-      this.simplemaps_worldmap.region_zoom = region.regionId;
-      this.simplemaps_worldmap.mapdata.regions[region.regionId].color =
-        "#EDC80A";
-      this.simplemaps_worldmap.refresh();
-      this.simplemaps_worldmap.mapdata.regions[region.regionId].color = this
-        .mobileDevice
-        ? "#FFFFFF"
-        : "#00A2FF";
+      this.mobileModalInfo = region;
+      //method updates the selected region based on the user changing the value in the select form element
+      //takes in region, sets the selectedRegion to the proper name and sets showMenu to false to hide the drop down
+      this.simplemaps_worldmap.popup("region", region.regionId);
+      // this.simplemaps_worldmap.region_zoom = region.regionId;
+      // this.simplemaps_worldmap.mapdata.regions[region.regionId].color =
+      //   "#EDC80A";
+      // this.simplemaps_worldmap.refresh();
       this.selectedRegion = region.name;
       this.showMenu = false;
     },
+    resetMap() {
+      //used to reset the map whenever the user clicks anywhere inside the map after making a selection
+      if (this.selectedRegion) {
+        Object.values(this.simplemaps_worldmap.mapdata.regions).forEach(
+          (region) => {
+            region.color = "#00A2FF";
+          }
+        );
+        this.simplemaps_worldmap.refresh();
+        this.selectedRegion = "";
+      }
+    },
   },
   created() {
+    //Upon creation of component, initialize/overwrite regions from mapdata with the regions from mergedRegions computed property
     this.simplemaps_worldmap.mapdata.regions = this.mergedRegions;
+    this.mobileModalInfo = Object.values(this.mergedRegions)[4];
     this.checkMobile();
     if (this.mobileDevice) {
+      //conditional used to check if the device is mobile and then sets main_settings accordingly
       this.simplemaps_worldmap.mapdata.main_settings.width = 400;
       this.simplemaps_worldmap.mapdata.main_settings.background_color =
         "#003D8E";
-      this.simplemaps_worldmap.mapdata.main_settings.state_color = "#FFFFFF";
       this.simplemaps_worldmap.mapdata.main_settings.initial_zoom = 4;
+      Object.values(this.simplemaps_worldmap.mapdata.regions)[4].hover_color =
+        "#EDC80A";
       this.simplemaps_worldmap.mapinfo.initial_view = {
         y: 50.99,
         x: 50.99,
@@ -262,14 +321,17 @@ export default {
   },
   computed: {
     simplemaps_worldmap: () => {
+      //gives access to this.simplemaps_worldmap
       return window.simplemaps_worldmap;
     },
     activeRegions: function () {
-      return Object.values(this.regions).map((region, index) => {
+      //value is used to provide the select form element with regions to display
+      return Object.values(this.mergedRegions).map((region, index) => {
         return {
           name: region.name,
-          regionId: index,
           readMoreUrl: region.readMoreUrl,
+          description: region.description,
+          regionId: index,
         };
       });
     },
@@ -278,7 +340,6 @@ export default {
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           navigator.userAgent
         );
-      console.log(isMobile, "isMobile from mergedRegions");
       //computed property that returns an object with the regions retreived from the API merged with the regional options
       let mergedRegions = {};
       let mergedArray = Object.values(this.regions).map((region) => {
@@ -301,6 +362,7 @@ export default {
         if (isMobile) {
           mergedRegions[i].zoomable = "yes";
           mergedRegions[i].color = "#FFFFFF";
+          mergedRegions[i].hover_color = "#EDC80A";
         }
       }
       return mergedRegions;
@@ -310,6 +372,24 @@ export default {
 </script>
 
 <style>
+@media screen and (max-width: 768px) {
+  .tt_sm {
+    border-radius: 5px;
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1000000;
+    background-color: white;
+    /* padding: 7px; */
+    padding-right: 10px;
+    margin-right: 10px;
+    opacity: 0.9;
+    font: 12px/1.5 Verdana, Arial, Helvetica, sans-serif;
+    color: black;
+    position: absolute;
+    width: 380px;
+    left: -190px;
+    bottom: -240px;
+  }
+}
 .tt_sm {
   border-radius: 5px;
   box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);

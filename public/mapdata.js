@@ -7,7 +7,7 @@ var simplemaps_worldmap_mapdata = {
     border_color: "#f0f2f3",
     // popups: "detect",
     popups: "on_click",
-    popup_nocss: "yes",
+    // popup_nocss: "yes",
 
     //State defaults
     state_description: "State description",
@@ -42,15 +42,16 @@ var simplemaps_worldmap_mapdata = {
 
     //Zoom settings
     zoom: "no",
-    back_image: "no",
+    back_image: "/", // SET TO FORWARDSLASH TO GET RID OF BACK ARROW ON MAP
     initial_back: "no",
-    initial_zoom: -1, //CHANGE ON MOBILE?
+    initial_zoom: -1, //CHANGE ON MOBILE
     initial_zoom_solo: "no",
     region_opacity: 0.0,
     region_hover_opacity: 0.0,
-    zoom_out_incrementally: "yes",
-    zoom_percentage: 0.2, //CHANGE ON MOBILE
-    zoom_time: 0.5,
+    zoom_out_incrementally: "no",
+    // zoom_percentage: 0.65,
+    zoom_percentage: 0.45,
+    zoom_time: 0,
 
     //Popup settings
     popup_color: "white",

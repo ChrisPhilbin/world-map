@@ -372,24 +372,6 @@ export default {
 </script>
 
 <style>
-@media screen and (max-width: 768px) {
-  .tt_sm {
-    border-radius: 5px;
-    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
-    z-index: 1000000;
-    background-color: white;
-    /* padding: 7px; */
-    padding-right: 10px;
-    margin-right: 10px;
-    opacity: 0.9;
-    font: 12px/1.5 Verdana, Arial, Helvetica, sans-serif;
-    color: black;
-    position: absolute;
-    width: 380px;
-    left: -190px;
-    bottom: -240px;
-  }
-}
 .tt_sm {
   border-radius: 5px;
   box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);

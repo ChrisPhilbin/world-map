@@ -1,6 +1,6 @@
 <template>
-  <div class="grid grid-cols-1 py-8 z-100">
-    <span v-if="!mobileDevice" class="inline"
+  <div v-if="!checkMobile()" class="grid grid-cols-1 py-8 z-100">
+    <span class="inline"
       ><p class="inline font-bold font-sans text-blue-900 text-2xl">
         Choose a location
       </p>
@@ -84,10 +84,10 @@
     id="map"
   >
     <div
-      v-if="mobileDevice && Object.keys(mobileModalInfo).length"
+      v-if="checkMobile() && Object.keys(mobileModalInfo).length"
       class="
         absolute
-        bottom-4
+        bottom-6
         text-black
         left-14
         bg-white
@@ -97,7 +97,7 @@
         rounded-md
       "
     >
-      <p class="font-bold pt-1 mx-8 text-2xl font-sans text-blue-900">
+      <p class="font-bold text-2xl pt-1 font-sans text-blue-900">
         {{ mobileModalInfo.name }}
       </p>
       <br /><span class="align-middle"
@@ -120,7 +120,7 @@
       >
     </div>
     <div
-      v-if="mobileDevice"
+      v-if="checkMobile()"
       class="
         grid grid-cols-1
         py-1
@@ -130,7 +130,7 @@
         absolute
         top-3
         bg-white
-        opacity-95
+        opacity-80
       "
     >
       <span class="inline"
@@ -220,8 +220,7 @@ export default {
   data() {
     return {
       showMenu: false,
-      mobileDevice: false,
-      selectedRegion: "Europe",
+      selectedRegion: this.checkMobile() ? "Europe" : "Nothing Selected",
       mobileModalInfo: {},
       regionOptions: {
         color: "#00A2FF",
@@ -257,60 +256,50 @@ export default {
           states: ["PT", "GB", "IE", "DE", "ES", "FR"],
           readMoreUrl: "http://www.slashdot.org",
         },
+        // 5: {
+        //   name: "Brazil",
+        //   states: ["BR"],
+        //   readMoreUrl: "http://www.microsoft.com",
+        // },
       },
     };
   },
   methods: {
     checkMobile() {
-      //method returns either true or false based on the device type detected
-      if (
-        /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        )
-      ) {
-        this.mobileDevice = true;
-      } else {
-        this.mobileDevice = false;
-      }
+      //regex expression to determine whether or not userAgent is mobile device
+      return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
     },
     updateRegion(region) {
       this.mobileModalInfo = region;
-      //method updates the selected region based on the user changing the value in the select form element
-      //takes in region, sets the selectedRegion to the proper name and sets showMenu to false to hide the drop down
       this.simplemaps_worldmap.popup("region", region.regionId);
-      // this.simplemaps_worldmap.region_zoom = region.regionId;
-      // this.simplemaps_worldmap.mapdata.regions[region.regionId].color =
-      //   "#EDC80A";
-      // this.simplemaps_worldmap.refresh();
       this.selectedRegion = region.name;
       this.showMenu = false;
     },
     resetMap() {
-      //used to reset the map whenever the user clicks anywhere inside the map after making a selection
-      if (this.selectedRegion) {
-        Object.values(this.simplemaps_worldmap.mapdata.regions).forEach(
-          (region) => {
-            region.color = "#00A2FF";
-          }
-        );
-        this.simplemaps_worldmap.refresh();
-        this.selectedRegion = "";
-      }
+      this.selectedRegion = "";
     },
   },
-  created() {
-    //Upon creation of component, initialize/overwrite regions from mapdata with the regions from mergedRegions computed property
+  async created() {
+    //fetch active regions from mock api server - could abstract away to vuex actions and dispatch action to update global store
+    // try {
+    //   let response = await fetch("http://www.someapiendpoint.com/regions/active")
+    //   let data = await response.json();
+    //   if (response.ok) {
+    //     this.regions = data;
+    //   }
+    // } catch (error) {
+    //   this.errors = true
+    // }
     this.simplemaps_worldmap.mapdata.regions = this.mergedRegions;
     this.mobileModalInfo = Object.values(this.mergedRegions)[4];
-    this.checkMobile();
-    if (this.mobileDevice) {
-      //conditional used to check if the device is mobile and then sets main_settings accordingly
-      this.simplemaps_worldmap.mapdata.main_settings.width = 400;
+    if (this.checkMobile()) {
+      this.simplemaps_worldmap.mapdata.main_settings.width = 375;
       this.simplemaps_worldmap.mapdata.main_settings.background_color =
         "#003D8E";
+      this.simplemaps_worldmap.mapdata.main_settings.state_color = "#EDC80A";
       this.simplemaps_worldmap.mapdata.main_settings.initial_zoom = 4;
-      Object.values(this.simplemaps_worldmap.mapdata.regions)[4].hover_color =
-        "#EDC80A";
       this.simplemaps_worldmap.mapinfo.initial_view = {
         y: 50.99,
         x: 50.99,
@@ -325,7 +314,7 @@ export default {
       return window.simplemaps_worldmap;
     },
     activeRegions: function () {
-      //value is used to provide the select form element with regions to display
+      //computed value is used to provide the select form element with regions to display
       return Object.values(this.mergedRegions).map((region, index) => {
         return {
           name: region.name,
@@ -340,6 +329,7 @@ export default {
         /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           navigator.userAgent
         );
+
       //computed property that returns an object with the regions retreived from the API merged with the regional options
       let mergedRegions = {};
       let mergedArray = Object.values(this.regions).map((region) => {
@@ -361,7 +351,7 @@ export default {
         );
         if (isMobile) {
           mergedRegions[i].zoomable = "yes";
-          mergedRegions[i].color = "#FFFFFF";
+          mergedRegions[i].color = "#EDC80A";
           mergedRegions[i].hover_color = "#EDC80A";
         }
       }
@@ -372,6 +362,7 @@ export default {
 </script>
 
 <style>
+/* styles for the map popups */
 .tt_sm {
   border-radius: 5px;
   box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);

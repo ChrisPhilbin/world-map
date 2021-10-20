@@ -6450,8 +6450,8 @@ var simplemaps_worldmap_mapinfo = {
     { lat: -34.615, x: 673.5, lng: -58.446, y: 724.1 },
     { lat: -33.874, x: 1798.2, lng: 151.203, y: 719.3 },
   ],
-  // initial_view: { y: 0.99, x: 0.99, x2: 2018.99, y2: 864.5600000000001 }, //CHANGE THIS WHEN MOBILE
-  initial_view: { y: 50.99, x: 50.99, x2: 2018.99, y2: 864.5600000000001 },
+  initial_view: { y: -100.99, x: 200.99, x2: 2018.99, y2: 864.5600000000001 }, //CLOSE
+  // initial_view: { y: 50.99, x: 50.99, x2: 2018.99, y2: 864.5600000000001 },
 };
 
 /* Map logic - do not edit */

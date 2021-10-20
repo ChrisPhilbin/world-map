@@ -63,14 +63,15 @@
               <label>
                 <input
                   type="radio"
-                  class="mr-3"
+                  class="mr-3 cursor-pointer"
                   name="selectedRegion"
                   :value="region.name"
                   v-on:change="updateRegion(region)"
                 />
-                <span class="inline font-bold font-sans">{{
-                  region.name
-                }}</span>
+                <span
+                  class="w-44 cursor-pointer inline-block font-bold font-sans"
+                  >{{ region.name }}</span
+                >
               </label>
             </li>
           </ul>
@@ -256,11 +257,11 @@ export default {
           states: ["PT", "GB", "IE", "DE", "ES", "FR"],
           readMoreUrl: "http://www.slashdot.org",
         },
-        // 5: {
-        //   name: "Brazil",
-        //   states: ["BR"],
-        //   readMoreUrl: "http://www.microsoft.com",
-        // },
+        5: {
+          name: "Brazil",
+          states: ["BR"],
+          readMoreUrl: "http://www.microsoft.com",
+        },
       },
     };
   },
@@ -278,7 +279,9 @@ export default {
       this.showMenu = false;
     },
     resetMap() {
-      this.selectedRegion = "";
+      if (!this.checkMobile) {
+        this.selectedRegion = "";
+      }
     },
   },
   async created() {

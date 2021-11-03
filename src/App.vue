@@ -2,6 +2,22 @@
   <router-view />
 </template>
 
+<script>
+export default {
+  // data() {
+  //   return {
+  //     mobile: window.innerWidth <= 700,
+  //   };
+  // },
+  // created() {
+  //   addEventListener("resize", () => {
+  //     this.mobile = innerWidth <= 700;
+  //     console.log("viewport changed!");
+  //   });
+  // },
+};
+</script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

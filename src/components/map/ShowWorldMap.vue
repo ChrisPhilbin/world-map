@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!checkMobile()" class="grid grid-cols-1 py-8 z-100">
+  <div v-if="!mobile" class="grid grid-cols-1 py-8 z-100">
     <span class="inline"
       ><p class="inline font-bold font-sans text-blue-900 text-2xl">
         Choose a location
@@ -81,28 +81,29 @@
   </div>
   <div
     v-on:click="resetMap()"
-    class="grid grid-cols-1 ml-auto mr-auto relative"
+    class="grid grid-cols-1 ml-auto mr-auto relative w-8/12"
     id="map"
   >
     <div
-      v-if="checkMobile() && Object.keys(mobileModalInfo).length"
+      v-if="mobile && Object.keys(mobileModalInfo).length"
       class="
         absolute
-        bottom-6
+        fixed
+        -bottom-16
+        shadow-lg
         text-black
-        left-14
         bg-white
-        w-9/12
+        w-full
         z-10
-        opacity-80
-        rounded-md
+        rounded
       "
     >
-      <p class="font-bold text-2xl pt-1 font-sans text-blue-900">
+      <p class="font-bold text-2xl pt-1 pl-8 font-sans text-blue-900 text-left">
         {{ mobileModalInfo.name }}
       </p>
-      <br /><span class="align-middle"
-        ><svg
+      <br />
+      <p class="text-left pl-8">
+        <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-6 w-6 text-blue-900 inline pb-1"
           viewBox="0 0 20 20"
@@ -117,22 +118,12 @@
           :href="mobileModalInfo.readMoreUrl"
           class="font-bold text-lg text-left font-sans text-blue-900"
           >Read more</a
-        ></span
-      >
+        >
+      </p>
     </div>
     <div
-      v-if="checkMobile()"
-      class="
-        grid grid-cols-1
-        py-1
-        z-10
-        mx-3
-        inline
-        absolute
-        top-3
-        bg-white
-        opacity-80
-      "
+      v-if="mobile"
+      class="grid grid-cols-1 py-1 z-10 mx-3 inline absolute top-7 bg-white"
     >
       <span class="inline"
         ><p class="inline font-bold font-sans text-blue-900 text-2xl">
@@ -202,9 +193,10 @@
                     :value="region.name"
                     v-on:change="updateRegion(region)"
                   />
-                  <span class="inline font-bold font-sans">{{
-                    region.name
-                  }}</span>
+                  <span
+                    class="w-44 cursor-pointer inline-block font-bold font-sans"
+                    >{{ region.name }}</span
+                  >
                 </label>
               </li>
             </ul>
@@ -220,8 +212,9 @@ export default {
   name: "ShowWorldMap",
   data() {
     return {
+      mobile: window.innerWidth <= 600,
       showMenu: false,
-      selectedRegion: this.checkMobile() ? "Europe" : "Nothing Selected",
+      selectedRegion: this.mobile ? "Western Europe" : "Nothing Selected",
       mobileModalInfo: {},
       regionOptions: {
         color: "#00A2FF",
@@ -257,21 +250,15 @@ export default {
           states: ["PT", "GB", "IE", "DE", "ES", "FR"],
           readMoreUrl: "http://www.slashdot.org",
         },
-        5: {
-          name: "Brazil",
-          states: ["BR"],
-          readMoreUrl: "http://www.microsoft.com",
-        },
+        // 5: {
+        //   name: "Brazil",
+        //   states: ["BR"],
+        //   readMoreUrl: "http://www.microsoft.com",
+        // },
       },
     };
   },
   methods: {
-    checkMobile() {
-      //regex expression to determine whether or not userAgent is mobile device
-      return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      );
-    },
     updateRegion(region) {
       this.mobileModalInfo = region;
       this.simplemaps_worldmap.popup("region", region.regionId);
@@ -279,12 +266,29 @@ export default {
       this.showMenu = false;
     },
     resetMap() {
-      if (!this.checkMobile) {
+      if (!this.mobile) {
         this.selectedRegion = "";
       }
     },
+    mobileConfig() {
+      this.selectedRegion = "Western Europe";
+      this.simplemaps_worldmap.mapdata.main_settings.width = 375;
+      this.simplemaps_worldmap.mapdata.main_settings.background_color =
+        "#003D8E";
+      this.simplemaps_worldmap.mapdata.main_settings.state_color = "#EDC80A";
+      this.simplemaps_worldmap.mapdata.main_settings.initial_zoom = 4;
+      this.simplemaps_worldmap.mapinfo.initial_view = {
+        y: 50.99,
+        x: 50.99,
+        x2: 2018.99,
+        y2: 2464.5600000000001,
+      };
+    },
   },
   async created() {
+    addEventListener("resize", () => {
+      this.mobile = innerWidth <= 600;
+    });
     //fetch active regions from mock api server - could abstract away to vuex actions and dispatch action to update global store
     // try {
     //   let response = await fetch("http://www.someapiendpoint.com/regions/active")
@@ -297,18 +301,14 @@ export default {
     // }
     this.simplemaps_worldmap.mapdata.regions = this.mergedRegions;
     this.mobileModalInfo = Object.values(this.mergedRegions)[4];
-    if (this.checkMobile()) {
-      this.simplemaps_worldmap.mapdata.main_settings.width = 375;
-      this.simplemaps_worldmap.mapdata.main_settings.background_color =
-        "#003D8E";
-      this.simplemaps_worldmap.mapdata.main_settings.state_color = "#EDC80A";
-      this.simplemaps_worldmap.mapdata.main_settings.initial_zoom = 4;
-      this.simplemaps_worldmap.mapinfo.initial_view = {
-        y: 50.99,
-        x: 50.99,
-        x2: 2018.99,
-        y2: 2464.5600000000001,
-      };
+
+    if (this.mobile) {
+      this.mobileConfig();
+    }
+  },
+  updated() {
+    if (this.mobile) {
+      this.mobileConfig();
     }
   },
   computed: {
@@ -328,10 +328,10 @@ export default {
       });
     },
     mergedRegions: function () {
-      let isMobile =
-        /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
+      // let isMobile =
+      //   /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      //     navigator.userAgent
+      //   );
 
       //computed property that returns an object with the regions retreived from the API merged with the regional options
       let mergedRegions = {};
@@ -352,7 +352,7 @@ export default {
           "REGION_NAME",
           mergedRegions[i].name
         );
-        if (isMobile) {
+        if (this.mobile) {
           mergedRegions[i].zoomable = "yes";
           mergedRegions[i].color = "#EDC80A";
           mergedRegions[i].hover_color = "#EDC80A";
